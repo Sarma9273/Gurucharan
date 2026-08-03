@@ -1,0 +1,1 @@
+window.GC_CONFIG = { portfolioApiUrl: 'PASTE_NEW_GOOGLE_APPS_SCRIPT_EXEC_URL_HERE' };

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sarma9273.github.io/Gurucharan/sitemap.xml
