@@ -1,121 +1,61 @@
-# Gurucharan — Security Intelligence Journey
+# Guru Charan — Security Intelligence Universe
 
-A clean, independent and cinematic personal portfolio for **Guru Charan Mavuduru**.
+An original cinematic portfolio built with React, TypeScript, Vite, React Three Fiber, Three.js and GSAP.
 
-This repository does **not** depend on the previous `Sarma9273.github.io` source repository, Astro, npm, React, GSAP, Three.js or any private service. It is a no-build static website designed for dependable GitHub Pages deployment.
+## Experience
 
-## Live address
-
-After the public GitHub repository is created with the exact name `Gurucharan`, the expected project-site URL is:
-
-```text
-https://sarma9273.github.io/Gurucharan/
-```
-
-The username in the URL is the GitHub account namespace. The website source itself lives only in the new `Gurucharan` repository.
-
-## Included experience
-
-- Cinematic boot sequence with Skip control
-- Original interactive canvas-based Security Intelligence Core
-- Responsive dark-first visual system and optional calm light theme
-- Scroll-based journey storytelling
-- Interactive AI Security, SOC and Applied AI focus selector
-- Horizontal flagship-project showcase
-- RA-XSOC/CyberGPT architecture explorer
-- Purposeful technology universe
+- Cinematic system boot sequence
+- Interactive WebGL security-intelligence core
+- Pointer-reactive 3D scene
+- Scroll-driven career story
+- Pinned horizontal project worlds
+- Interactive RA-XSOC architecture explorer
+- 3D technology universe
 - Live Google Drive learning journal
-- Automatic metadata creation for future Google Docs
-- Custom Apps Script blog reader
-- Contact form delivered to Gmail through a new Apps Script backend
-- Local fallback articles when the backend is unavailable
-- Responsive navigation, reduced-motion support and keyboard accessibility
-- GitHub Actions deployment with no package installation or build step
+- Fresh Apps Script contact and publishing backend
+- GitHub Pages deployment
 
-## Originality
+The site is inspired by the ambition of immersive creative portfolios, but its composition, 3D system, visual identity, motion language and content are original.
 
-The public MoncyDev portfolio was used only as an interaction-quality reference. This project does not copy its 3D avatar, layout, source components, assets, colour system, typography composition or motion sequence. The implementation uses an original AI-security command-centre concept and a lightweight canvas engine written specifically for this portfolio.
-
-## Repository structure
-
-```text
-Gurucharan/
-├── .github/workflows/deploy.yml
-├── apps-script/
-│   ├── PortfolioBackend.gs
-│   └── README.md
-├── assets/
-│   ├── css/styles.css
-│   ├── images/
-│   ├── js/
-│   └── resume/
-├── docs/
-├── tools/verify_repository.py
-├── index.html
-├── projects.html
-├── project.html
-├── blogs.html
-├── experience.html
-├── resume.html
-├── contact.html
-└── 404.html
-```
-
-## First-time setup
-
-Follow these guides in order:
-
-1. [`docs/01_CREATE_REPOSITORY.md`](docs/01_CREATE_REPOSITORY.md)
-2. [`docs/02_APPS_SCRIPT_SETUP.md`](docs/02_APPS_SCRIPT_SETUP.md)
-3. [`docs/03_CONNECT_AND_TEST.md`](docs/03_CONNECT_AND_TEST.md)
-4. [`docs/04_DRIVE_CONTENT_WORKFLOW.md`](docs/04_DRIVE_CONTENT_WORKFLOW.md)
-
-## Local preview
-
-No Node.js or npm is required.
-
-From the repository root:
+## Quick start
 
 ```powershell
-python -m http.server 8080
+npm install
+npm run dev
 ```
 
 Open:
 
 ```text
-http://localhost:8080/
+http://localhost:5173/Gurucharan/
 ```
 
-Stop the server with `Ctrl + C`.
+## Connect the fresh backend
 
-## Repository verification
+1. Create a blank Google Apps Script project.
+2. Paste `apps-script/PortfolioBackend.gs` into `Code.gs`.
+3. Run `setupPortfolioSystem()`.
+4. Run `installPortfolioAutomation()`.
+5. Deploy as a Web App:
+   - Execute as: Me
+   - Access: Anyone
+6. Copy the URL ending in `/exec`.
+7. Open `src/config.ts`.
+8. Replace `PASTE_NEW_GOOGLE_APPS_SCRIPT_EXEC_URL_HERE`.
+9. Restart the Vite dev server.
 
-```powershell
-python tools/verify_repository.py
-```
+## GitHub Pages
 
-## Important configuration
-
-After deploying the new Apps Script backend, open:
+Create a public repository named `Gurucharan`, push this source to `main`, and select:
 
 ```text
-assets/js/config.js
+Settings → Pages → Source: GitHub Actions
 ```
 
-Replace the placeholder with the public Web App URL ending in `/exec`:
-
-```js
-window.GC_CONFIG = {
-  portfolioApiUrl: 'https://script.google.com/macros/s/DEPLOYMENT_ID/exec'
-};
-```
-
-## Resume
-
-Replace the placeholder with the final resume PDF:
+The expected site URL is:
 
 ```text
-assets/resume/Guru_Charan_Mavuduru_Resume.pdf
+https://sarma9273.github.io/Gurucharan/
 ```
 
-Then add or update the download link in `resume.html`.
+This hostname belongs to the GitHub account; it does not depend on an old `Sarma9273.github.io` repository.
