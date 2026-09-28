@@ -4,6 +4,11 @@ import { hasLiveBackend, PORTFOLIO_API_URL } from '../config';
 type ContactStatus = 'idle' | 'sending' | 'sent' | 'error';
 
 const MAIL_TO = 'charanmavuduru9273@gmail.com';
+const BACKEND_ORIGINS = new Set([
+  new URL(PORTFOLIO_API_URL || 'https://script.google.com').origin,
+  'https://script.google.com',
+  'https://script.googleusercontent.com',
+]);
 
 export default function Contact() {
   const form = useRef<HTMLFormElement>(null);
@@ -14,6 +19,7 @@ export default function Contact() {
   useEffect(() => {
     const handleBackendMessage = (event: MessageEvent) => {
       if (event.source !== responseFrame.current?.contentWindow) return;
+      if (!BACKEND_ORIGINS.has(event.origin)) return;
       if (!event.data || event.data.type !== 'portfolio-contact') return;
 
       if (event.data.ok === true) {
