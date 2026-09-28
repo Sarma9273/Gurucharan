@@ -40,6 +40,15 @@ export default function App() {
         <strong>SECURITY INTELLIGENCE UNIVERSE / V5</strong>
         <a href="#top">Return to signal ↑</a>
       </footer>
+      <button
+        type="button"
+        className="back-to-top"
+        aria-label="Back to top"
+        title="Back to top"
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      >
+        ↑
+      </button>
     </>
   );
 }
