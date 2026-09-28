@@ -10,6 +10,9 @@ import Architecture from './components/Architecture';
 import TechUniverse from './components/TechUniverse';
 import LiveJournal from './components/LiveJournal';
 import Contact from './components/Contact';
+import ExperienceSystem from './components/ExperienceSystem';
+import GuruBot from './components/GuruBot';
+import PortfolioIntelligence from './components/PortfolioIntelligence';
 
 export default function App() {
   const [ready, setReady] = useState(false);
@@ -26,15 +29,18 @@ export default function App() {
       {!ready && <CinematicLoader onComplete={complete} />}
       <CustomCursor />
       <Header />
+      <ExperienceSystem />
       <main className={ready ? 'site-ready' : ''}>
         <Hero mode={mode} onModeChange={setMode} />
         <Journey />
+        <PortfolioIntelligence />
         <Projects />
         <Architecture />
         <TechUniverse />
         <LiveJournal />
         <Contact />
       </main>
+      <GuruBot />
       <footer className="footer">
         <span>© 2026 GURU CHARAN MAVUDURU</span>
         <strong>SECURITY INTELLIGENCE UNIVERSE / V5</strong>
