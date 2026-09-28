@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { fallbackBlogs } from '../data';
 import { hasLiveBackend, PORTFOLIO_API_URL } from '../config';
+import CinematicLoader from './CinematicLoader';
 
 type Blog = {
   id?: string;
@@ -93,6 +94,7 @@ export default function LiveJournal() {
   const [article, setArticle] = useState<{ title: string; html: string } | null>(null);
   const [articleLoading, setArticleLoading] = useState(false);
   const [articleError, setArticleError] = useState('');
+  const [articleLoaderDone, setArticleLoaderDone] = useState(false);
 
   useEffect(() => {
     if (!hasLiveBackend) return;
@@ -130,13 +132,17 @@ export default function LiveJournal() {
   }, []);
 
   useEffect(() => {
-    if (!article) return;
+    if (!article && !articleLoading && !articleError) return;
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setArticle(null);
+      if (event.key === 'Escape') {
+        setArticle(null);
+        setArticleLoading(false);
+        setArticleError('');
+      }
     };
 
     window.addEventListener('keydown', onKeyDown);
@@ -144,13 +150,14 @@ export default function LiveJournal() {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [article]);
+  }, [article, articleLoading, articleError]);
 
   const openArticle = (blog: Blog) => {
     if (!blog.id || !hasLiveBackend) return;
 
     setArticle(null);
     setArticleError('');
+    setArticleLoaderDone(false);
     setArticleLoading(true);
 
     const callback = `gcArticle_${Date.now()}`;
@@ -251,6 +258,9 @@ export default function LiveJournal() {
       {(articleLoading || articleError || article) && (
         <div className="article-reader" role="dialog" aria-modal="true" aria-label="GURUVERSE learning journal">
           <div className="article-reader-backdrop" onClick={() => !articleLoading && setArticle(null)} />
+          {articleLoading && !articleLoaderDone ? (
+            <CinematicLoader variant="article" onComplete={() => setArticleLoaderDone(true)} />
+          ) : null}
           <div className="article-reader-shell">
             <div className="article-reader-bar">
               <div>
