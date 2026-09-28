@@ -59,10 +59,10 @@ export default function CinematicLoader({ onComplete, variant = 'boot' }: Props)
         return;
       }
 
+      // Preserve the original loader's reveal: the screen lifts upward.
       gsap.to(element, {
-        opacity: 0,
         clipPath: 'inset(0 0 100% 0)',
-        duration: 0.65,
+        duration: isArticle ? 0.65 : 0.9,
         ease: 'power4.inOut',
         onComplete: () => {
           element.style.display = 'none';
@@ -79,7 +79,8 @@ export default function CinematicLoader({ onComplete, variant = 'boot' }: Props)
     const value = { current: 0 };
     const tween = gsap.to(value, {
       current: 100,
-      duration: isArticle ? 1.9 : 2.4,
+      // The original GURUVERSE boot timing was 4.2s.
+      duration: isArticle ? 1.9 : 4.2,
       ease: 'power2.inOut',
       onUpdate: () => {
         const next = Math.round(value.current);
@@ -89,8 +90,8 @@ export default function CinematicLoader({ onComplete, variant = 'boot' }: Props)
       onComplete: finish,
     });
 
-    // Safety net: this overlay can never permanently block the portfolio.
-    const safetyTimer = window.setTimeout(finish, isArticle ? 3000 : 5000);
+    // Safety only; it never changes the normal 4.2s visual sequence.
+    const safetyTimer = window.setTimeout(finish, isArticle ? 3000 : 6000);
 
     return () => {
       tween.kill();
@@ -134,9 +135,7 @@ export default function CinematicLoader({ onComplete, variant = 'boot' }: Props)
         </div>
         <div className="loader-track"><i style={{ width: `${progress}%` }} /></div>
       </div>
-      <button type="button" className="loader-skip" onClick={skip}>
-        Skip intro
-      </button>
+      <button type="button" className="loader-skip" onClick={skip}>Skip intro</button>
     </div>
   );
 }
