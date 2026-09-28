@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FocusMode } from './data';
-import CinematicLoader from './components/CinematicLoader';
 import CustomCursor from './components/CustomCursor';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -12,10 +11,7 @@ import LiveJournal from './components/LiveJournal';
 import Contact from './components/Contact';
 
 export default function App() {
-  const [showIntro, setShowIntro] = useState(true);
   const [mode, setMode] = useState<FocusMode>('ai');
-
-  const complete = useCallback(() => setShowIntro(false), []);
 
   useEffect(() => {
     document.documentElement.dataset.mode = mode;
@@ -23,7 +19,6 @@ export default function App() {
 
   return (
     <>
-      {showIntro && <CinematicLoader onComplete={complete} />}
       <CustomCursor />
       <Header />
       <main>
