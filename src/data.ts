@@ -1,4 +1,7 @@
 export type FocusMode = 'ai' | 'soc' | 'data';
+export type Experience = { company:string; role:string; duration:string; location:string; description:string; technologies:string[] };
+export type Research = { title:string; category:string; description:string; technologies:string[]; status:string; difficulty:string; featured?:boolean; link?:string };
+
 
 export const focusModes = {
   ai: {
@@ -84,8 +87,7 @@ export const projects = [
     description:
       'A modular incident-response copilot evolving CyberGPT into a testable retrieval and reasoning architecture with persistent embeddings, confidence analysis and safer analyst guidance.',
     evidence: ['30 structured knowledge documents', 'FAISS retrieval pipeline', 'Typed domain contracts', 'Regression-focused development'],
-    accent: '#9f7cff',
-    code: 'RETRIEVE / REASON / RESPOND',
+    accent: '#9f7cff', category:'Cybersecurity', technologies:['Python','FAISS','SentenceTransformers','MITRE ATT&CK','FastAPI'], repo:'https://github.com/Sarma9273/ra-xsoc-security-copilot', overview:'A modular incident-response copilot evolving CyberGPT into a retrieval and reasoning architecture for security analysts.', problem:'Security analysts need structured evidence retrieval and repeatable response guidance across heterogeneous incident context.', solution:'Retrieve relevant security knowledge, map behavior to MITRE ATT&CK, surface confidence and provide analyst-oriented response guidance.', architecture:['Incident input','Knowledge normalization','Embeddings','FAISS retrieval','Confidence & novelty','MITRE ATT&CK mapping','Response guidance'], workflow:['Capture incident context','Normalize evidence','Embed query','Retrieve evidence','Assess confidence','Map techniques','Generate response guidance'], achievements:['30 structured knowledge documents','FAISS retrieval pipeline','Typed domain contracts','Regression-focused development'], repo:'https://github.com/Sarma9273/ra-xsoc-security-copilot', code: 'RETRIEVE / REASON / RESPOND',
   },
   {
     number: '02',
@@ -95,8 +97,7 @@ export const projects = [
     description:
       'A Google Colab prototype that classifies incidents, retrieves relevant security knowledge, maps MITRE ATT&CK and generates containment, investigation, recovery and prevention guidance.',
     evidence: ['Novel-threat signal', 'MITRE ATT&CK mapping', 'Review queue', 'SOC report generation'],
-    accent: '#55e6ff',
-    code: 'INCIDENT → KNOWLEDGE → PLAYBOOK',
+    accent: '#55e6ff', category:'AI', technologies:['Python','FAISS','SentenceTransformers','RAG','MITRE ATT&CK'], overview:'A retrieval-augmented security incident response copilot for attack analysis and structured reporting.', problem:'Incident descriptions often lack immediately relevant security context and response structure.', solution:'Classify incidents, retrieve relevant knowledge, map attack behavior and generate structured investigation and response guidance.', architecture:['Security incident input','Incident classification','Knowledge base','SentenceTransformer embeddings','FAISS retrieval','Hybrid ranking','MITRE ATT&CK mapping','Response generation'], workflow:['Receive alert','Identify attack context','Create embedding','Retrieve knowledge','Rank context','Map ATT&CK','Generate response','Produce report'], achievements:['Novel-threat signal','MITRE ATT&CK mapping','Review queue','SOC report generation'], code: 'INCIDENT → KNOWLEDGE → PLAYBOOK',
   },
   {
     number: '03',
@@ -106,8 +107,7 @@ export const projects = [
     description:
       'A controlled virtual environment for producing attacks, collecting endpoint and network telemetry, investigating alerts and documenting response decisions.',
     evidence: ['Sysmon telemetry', 'Windows auditing', 'Splunk investigation', 'Isolated SOC-LAB network'],
-    accent: '#67f0b8',
-    code: 'SIMULATE / OBSERVE / INVESTIGATE',
+    accent: '#67f0b8', category:'Cybersecurity', technologies:['Kali Linux','Windows','Ubuntu','Splunk','Sysmon','Wireshark'], overview:'A controlled virtual environment for generating attack evidence, collecting telemetry and practising SOC investigations.', code: 'SIMULATE / OBSERVE / INVESTIGATE',
   },
   {
     number: '04',
@@ -117,8 +117,7 @@ export const projects = [
     description:
       'A low-cost operational system for tickets, assets, vendors, safety checks and reporting using Google Sheets, Forms and Apps Script.',
     evidence: ['Ticket automation', 'Risk classification', 'SLA tracking', 'Institution-ready workflows'],
-    accent: '#f7b955',
-    code: 'REQUEST → CLASSIFY → RESOLVE',
+    accent: '#f7b955', category:'Software Engineering', technologies:['Google Sheets','Forms','Apps Script','Automation'], repo:'https://github.com/Sarma9273', overview:'A low-cost institutional operations concept for tickets, assets, vendors, safety checks and reporting.', code: 'REQUEST → CLASSIFY → RESOLVE',
   },
   {
     number: '05',
@@ -128,8 +127,7 @@ export const projects = [
     description:
       'A MATLAB and Simulink comparison of PSO, Osprey Optimisation and a modified Osprey method for maximum-power-point tracking under partial shading.',
     evidence: ['Partial-shading cases', 'Algorithm comparison', 'Simulation evidence', 'Renewable-energy research'],
-    accent: '#ff7a90',
-    code: 'SENSE → OPTIMISE → TRACK',
+    accent: '#ff7a90', category:'Research', technologies:['MATLAB','Simulink','PSO','Osprey Optimization','Solar PV'], overview:'A comparative solar MPPT research project under partial-shading conditions.', code: 'SENSE → OPTIMISE → TRACK',
   },
   {
     number: '06',
@@ -139,9 +137,22 @@ export const projects = [
     description:
       'This portfolio itself: an original React and WebGL experience connected to a Drive-powered learning journal and contact backend.',
     evidence: ['React Three Fiber', 'GSAP storytelling', 'Drive CMS', 'GitHub Pages automation'],
-    accent: '#7bb7ff',
-    code: 'IDENTITY → EVIDENCE → CONNECTION',
+    accent: '#7bb7ff', category:'Portfolio', technologies:['React','TypeScript','Vite','React Three Fiber','Three.js','GSAP'], repo:'https://github.com/Sarma9273/Gurucharan', demo:'https://sarma9273.github.io/Gurucharan/', overview:'The cinematic portfolio experience itself, now extended with GURUVERSE intelligence and exploration capabilities.', code: 'IDENTITY → EVIDENCE → CONNECTION',
   },
+];
+
+
+
+export const experience: Experience[] = [
+  { company:'Swaminarayan Gurukul International School', role:'Computer Teacher', duration:'Jun 2025 – Present', location:'Tirupati, Andhra Pradesh', description:'Teaching programming fundamentals, Python, HTML, CSS, digital literacy and practical software development concepts.', technologies:['Python','HTML','CSS','Programming','Teaching'] },
+  { company:'SynthoQuest', role:'Cybersecurity Trainer', duration:'Dec 2024 – May 2025', location:'Remote', description:'Designed and delivered cybersecurity and SOC training covering SIEM, threat intelligence, incident response and security operations.', technologies:['SOC','SIEM','Threat Intelligence','Incident Response'] },
+  { company:'APTRANSCO', role:'Substation Documentation Intern', duration:'May 2024 – Jun 2024', location:'Simhachalam', description:'Supported technical documentation activities in a substation environment.', technologies:['Documentation','Electrical Engineering','Systems'] },
+];
+
+export const research: Research[] = [
+  { title:'Modified Osprey Optimization Algorithm for MPPT', category:'IEEE Research', description:'Research on improving maximum-power-point tracking under partial shading using MATLAB/Simulink optimisation experiments.', technologies:['MATLAB','Simulink','PV Systems','Optimization'], status:'Published', difficulty:'Advanced', featured:true },
+  { title:'Retrieval-Augmented AI Security', category:'Artificial Intelligence', description:'Research on combining retrieval-augmented generation with cybersecurity incident response for evidence-aware analyst assistance.', technologies:['RAG','FAISS','LLMs','Python'], status:'Ongoing', difficulty:'Expert', featured:true },
+  { title:'Autonomous SOC', category:'Future Research', description:'Exploration of AI-driven security operations combining detection, reasoning, threat intelligence and response orchestration.', technologies:['AI Agents','SOAR','SOC','Threat Intelligence'], status:'Future', difficulty:'Expert', featured:true },
 ];
 
 export const architectureStages = [
