@@ -35,7 +35,7 @@ a { color: inherit; text-decoration: none; }
 button { color: inherit; }
 img { display: block; max-width: 100%; }
 ::selection { background: var(--mode); color: #030507; }
-main { opacity: 0; transition: opacity .6s ease; }
+main { opacity: 1; transition: opacity .6s ease; }
 main.site-ready { opacity: 1; }
 .section { padding: 140px clamp(24px, 6vw, 100px); position: relative; }
 .micro-label {
