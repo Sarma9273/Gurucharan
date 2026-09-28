@@ -32,7 +32,7 @@ jobs:
 
       - name: Type-check and build
         env:
-          VITE_PORTFOLIO_API_URL: ${{ vars.VITE_PORTFOLIO_API_URL }}
+          VITE_PORTFOLIO_API_URL: https://script.google.com/macros/s/AKfycbz0jrdX1n-_SS8E1yRLdGUXjHcphb0p1urYyFbi5gGar0q3Xt8iAPagjY3NFZmRSq67/exec
         run: npm run build
 
       - name: Configure GitHub Pages
