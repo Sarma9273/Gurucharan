@@ -22,6 +22,70 @@ type ArticlePayload = {
   error?: string;
 };
 
+const ALLOWED_TAGS = new Set([
+  'A', 'ABBR', 'B', 'BLOCKQUOTE', 'BR', 'CODE', 'DIV', 'EM', 'H1', 'H2', 'H3',
+  'H4', 'H5', 'H6', 'HR', 'I', 'IMG', 'LI', 'MARK', 'OL', 'P', 'PRE', 'SMALL',
+  'STRONG', 'SUB', 'SUP', 'TABLE', 'TBODY', 'TD', 'TFOOT', 'TH', 'THEAD', 'TR', 'UL',
+]);
+
+const ALLOWED_ATTRS = new Set([
+  'ALT', 'COLSPAN', 'HEIGHT', 'HREF', 'REL', 'ROWSPAN', 'SRC', 'TARGET', 'TITLE', 'WIDTH', 'CLASS',
+]);
+
+function isSafeUrl(value: string, kind: 'href' | 'src') {
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+
+  try {
+    const url = new URL(trimmed, window.location.href);
+    if (url.protocol === 'https:') return true;
+    if (url.origin === window.location.origin) return true;
+    return kind === 'href' && url.protocol === 'mailto:';
+  } catch {
+    return false;
+  }
+}
+
+function sanitizeArticleHtml(dirtyHtml: string) {
+  const document = new DOMParser().parseFromString(dirtyHtml, 'text/html');
+
+  for (const element of Array.from(document.body.querySelectorAll('*'))) {
+    if (!ALLOWED_TAGS.has(element.tagName)) {
+      element.remove();
+      continue;
+    }
+
+    for (const attribute of Array.from(element.attributes)) {
+      const name = attribute.name.toUpperCase();
+      if (!ALLOWED_ATTRS.has(name) || name.startsWith('ON') || name === 'STYLE') {
+        element.removeAttribute(attribute.name);
+      }
+    }
+
+    if (element instanceof HTMLAnchorElement) {
+      if (!isSafeUrl(element.getAttribute('href') || '', 'href')) {
+        element.removeAttribute('href');
+      }
+      if (element.getAttribute('target') === '_blank') {
+        element.setAttribute('rel', 'noopener noreferrer');
+      } else {
+        element.removeAttribute('target');
+      }
+    }
+
+    if (element instanceof HTMLImageElement) {
+      if (!isSafeUrl(element.getAttribute('src') || '', 'src')) {
+        element.remove();
+        continue;
+      }
+      element.setAttribute('loading', 'lazy');
+      element.setAttribute('decoding', 'async');
+    }
+  }
+
+  return document.body.innerHTML;
+}
+
 export default function LiveJournal() {
   const [blogs, setBlogs] = useState<Blog[]>(fallbackBlogs);
   const [source, setSource] = useState<'live' | 'fallback'>('fallback');
@@ -104,7 +168,7 @@ export default function LiveJournal() {
       delete (window as unknown as Record<string, unknown>)[callback];
 
       if (payload.ok && payload.title && payload.html) {
-        setArticle({ title: payload.title, html: payload.html });
+        setArticle({ title: payload.title, html: sanitizeArticleHtml(payload.html) });
         setArticleError('');
       } else {
         setArticleError(payload.error || 'The learning journal could not be loaded.');
