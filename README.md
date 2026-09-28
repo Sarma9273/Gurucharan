@@ -1,61 +1,75 @@
 # Guru Charan — Security Intelligence Universe
 
-An original cinematic portfolio built with React, TypeScript, Vite, React Three Fiber, Three.js and GSAP.
+An immersive personal engineering portfolio built with React, TypeScript, Vite, React Three Fiber, Three.js and GSAP.
 
-## Experience
+## Current architecture
 
-- Cinematic system boot sequence
-- Interactive WebGL security-intelligence core
-- Pointer-reactive 3D scene
+Gurucharan is the canonical portfolio UI. Its cinematic visual system is preserved while the GURUVERSE feature model supplies the information architecture and interaction layer.
+
+### Experience layer
+- Cinematic boot sequence
+- Custom cursor and pointer interaction
+- WebGL security-intelligence core
 - Scroll-driven career story
 - Pinned horizontal project worlds
-- Interactive RA-XSOC architecture explorer
-- 3D technology universe
-- Live Google Drive learning journal
-- Fresh Apps Script contact and publishing backend
-- GitHub Pages deployment
+- Recruiter / Engineer / Explore modes
+- Command palette with search (Ctrl/⌘ K)
 
-The site is inspired by the ambition of immersive creative portfolios, but its composition, 3D system, visual identity, motion language and content are original.
+### Intelligence layer
+- Contextual GURU-BOT
+- Project-aware questions and answers
+- Overview, architecture, workflow, stack, problem, solution and results intents
 
-## Quick start
+### Exploration layer
+- Searchable project explorer
+- Domain/category filtering
+- Detailed project case-study modal
+- GitHub and live-demo links where available
+- Architecture and workflow evidence
 
-```powershell
+### Professional layer
+- About / identity
+- Experience
+- Research
+- Resume
+- Live Google Drive learning journal with local fallback
+- Contact form with Apps Script backend fallback
+- Responsive navigation and accessibility foundations
+- SEO, canonical metadata, Open Graph/Twitter metadata and structured data
+
+## Development
+
+```bash
 npm install
 npm run dev
+npm run check
+npm run build
 ```
 
-Open:
+Local site:
 
 ```text
 http://localhost:5173/Gurucharan/
 ```
 
-## Connect the fresh backend
-
-1. Create a blank Google Apps Script project.
-2. Paste `apps-script/PortfolioBackend.gs` into `Code.gs`.
-3. Run `setupPortfolioSystem()`.
-4. Run `installPortfolioAutomation()`.
-5. Deploy as a Web App:
-   - Execute as: Me
-   - Access: Anyone
-6. Copy the URL ending in `/exec`.
-7. Open `src/config.ts`.
-8. Replace `PASTE_NEW_GOOGLE_APPS_SCRIPT_EXEC_URL_HERE`.
-9. Restart the Vite dev server.
-
-## GitHub Pages
-
-Create a public repository named `Gurucharan`, push this source to `main`, and select:
-
-```text
-Settings → Pages → Source: GitHub Actions
-```
-
-The expected site URL is:
+Production site:
 
 ```text
 https://sarma9273.github.io/Gurucharan/
 ```
 
-This hostname belongs to the GitHub account; it does not depend on an old `Sarma9273.github.io` repository.
+## Backend
+
+The optional Google Apps Script backend is in `apps-script/PortfolioBackend.gs`. Set the `/exec` endpoint in `src/config.ts` to enable the live contact and learning-journal integration.
+
+## Deployment
+
+GitHub Actions builds and deploys the Vite application to GitHub Pages whenever `main` changes.
+
+## Canonical repository
+
+```text
+https://github.com/Sarma9273/Gurucharan
+```
+
+The repository is intended to be the single canonical personal portfolio. Other project repositories remain independent technical work and are not merged into this repository.
