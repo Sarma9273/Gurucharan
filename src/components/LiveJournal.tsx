@@ -15,17 +15,30 @@ type Blog = {
   featured?: boolean;
 };
 
+type ArticlePayload = {
+  ok: boolean;
+  title?: string;
+  html?: string;
+  error?: string;
+};
+
 export default function LiveJournal() {
   const [blogs, setBlogs] = useState<Blog[]>(fallbackBlogs);
   const [source, setSource] = useState<'live' | 'fallback'>('fallback');
   const [filter, setFilter] = useState('All');
+  const [article, setArticle] = useState<{ title: string; html: string } | null>(null);
+  const [articleLoading, setArticleLoading] = useState(false);
+  const [articleError, setArticleError] = useState('');
 
   useEffect(() => {
     if (!hasLiveBackend) return;
 
     const callback = `gcBlogs_${Date.now()}`;
     const script = document.createElement('script');
-    const timeout = window.setTimeout(() => script.remove(), 9000);
+    const timeout = window.setTimeout(() => {
+      script.remove();
+      delete (window as unknown as Record<string, unknown>)[callback];
+    }, 9000);
 
     (window as unknown as Record<string, unknown>)[callback] = (payload: { ok: boolean; blogs?: Blog[] }) => {
       if (payload.ok && payload.blogs?.length) {
@@ -38,7 +51,11 @@ export default function LiveJournal() {
     };
 
     script.src = `${PORTFOLIO_API_URL}?action=blogs&callback=${callback}&refresh=1`;
-    script.onerror = () => script.remove();
+    script.onerror = () => {
+      window.clearTimeout(timeout);
+      script.remove();
+      delete (window as unknown as Record<string, unknown>)[callback];
+    };
     document.body.appendChild(script);
 
     return () => {
@@ -48,6 +65,66 @@ export default function LiveJournal() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!article) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setArticle(null);
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [article]);
+
+  const openArticle = (blog: Blog) => {
+    if (!blog.id || !hasLiveBackend) return;
+
+    setArticle(null);
+    setArticleError('');
+    setArticleLoading(true);
+
+    const callback = `gcArticle_${Date.now()}`;
+    const script = document.createElement('script');
+    const timeout = window.setTimeout(() => {
+      script.remove();
+      delete (window as unknown as Record<string, unknown>)[callback];
+      setArticleLoading(false);
+      setArticleError('The learning journal could not be loaded. Please try again.');
+    }, 12000);
+
+    (window as unknown as Record<string, unknown>)[callback] = (payload: ArticlePayload) => {
+      window.clearTimeout(timeout);
+      script.remove();
+      delete (window as unknown as Record<string, unknown>)[callback];
+
+      if (payload.ok && payload.title && payload.html) {
+        setArticle({ title: payload.title, html: payload.html });
+        setArticleError('');
+      } else {
+        setArticleError(payload.error || 'The learning journal could not be loaded.');
+      }
+      setArticleLoading(false);
+    };
+
+    script.src =
+      `${PORTFOLIO_API_URL}?action=read&id=${encodeURIComponent(blog.id)}&format=json&callback=${callback}`;
+    script.onerror = () => {
+      window.clearTimeout(timeout);
+      script.remove();
+      delete (window as unknown as Record<string, unknown>)[callback];
+      setArticleLoading(false);
+      setArticleError('The learning journal could not be loaded. Please try again.');
+    };
+
+    document.body.appendChild(script);
+  };
+
   const domains = useMemo(
     () => ['All', ...Array.from(new Set(blogs.map((blog) => blog.domain)))],
     [blogs],
@@ -55,38 +132,33 @@ export default function LiveJournal() {
   const visible = filter === 'All' ? blogs : blogs.filter((blog) => blog.domain === filter);
 
   return (
-    <section id="journal" className="journal section">
-      <div className="journal-head">
-        <div className="section-heading compact">
-          <span className="micro-label">05 / LIVE LEARNING JOURNAL</span>
-          <h2>Notes from systems<br />still being built.</h2>
+    <>
+      <section id="journal" className="journal section">
+        <div className="journal-head">
+          <div className="section-heading compact">
+            <span className="micro-label">05 / LIVE LEARNING JOURNAL</span>
+            <h2>Notes from systems<br />still being built.</h2>
+          </div>
+          <div className={`journal-source ${source}`}>
+            <i /> {source === 'live' ? 'SYNCHRONISED WITH GOOGLE DRIVE' : 'LOCAL PREVIEW DATA'}
+          </div>
         </div>
-        <div className={`journal-source ${source}`}>
-          <i /> {source === 'live' ? 'SYNCHRONISED WITH GOOGLE DRIVE' : 'LOCAL PREVIEW DATA'}
+
+        <div className="journal-filters">
+          {domains.map((domain) => (
+            <button
+              type="button"
+              key={domain}
+              className={filter === domain ? 'active' : ''}
+              onClick={() => setFilter(domain)}
+            >
+              {domain}
+            </button>
+          ))}
         </div>
-      </div>
 
-      <div className="journal-filters">
-        {domains.map((domain) => (
-          <button
-            type="button"
-            key={domain}
-            className={filter === domain ? 'active' : ''}
-            onClick={() => setFilter(domain)}
-          >
-            {domain}
-          </button>
-        ))}
-      </div>
-
-      <div className="journal-grid">
-        {visible.map((blog, index) => {
-          const href =
-            blog.url ||
-            (blog.id && hasLiveBackend
-              ? `${PORTFOLIO_API_URL}?action=read&id=${encodeURIComponent(blog.id)}`
-              : undefined);
-          return (
+        <div className="journal-grid">
+          {visible.map((blog, index) => (
             <article className="journal-card" key={`${blog.title}-${index}`}>
               <div className="journal-index">{String(index + 1).padStart(2, '0')}</div>
               <div className="journal-meta">
@@ -99,12 +171,63 @@ export default function LiveJournal() {
               ) : null}
               <div className="journal-card-footer">
                 <span>{blog.readingTime ? `${blog.readingTime} MIN READ` : 'BUILD NOTE'}</span>
-                {href ? <a href={href} target="_blank" rel="noreferrer">Open article ↗</a> : <span>Connect backend to read</span>}
+                {blog.id && hasLiveBackend ? (
+                  <button type="button" className="journal-open" onClick={() => openArticle(blog)}>
+                    Open article ↗
+                  </button>
+                ) : (
+                  <span>Connect backend to read</span>
+                )}
               </div>
             </article>
-          );
-        })}
-      </div>
-    </section>
+          ))}
+        </div>
+      </section>
+
+      {(articleLoading || articleError || article) && (
+        <div className="article-reader" role="dialog" aria-modal="true" aria-label="GURUVERSE learning journal">
+          <div className="article-reader-backdrop" onClick={() => !articleLoading && setArticle(null)} />
+          <div className="article-reader-shell">
+            <div className="article-reader-bar">
+              <div>
+                <span className="micro-label">GURUVERSE / LIVE LEARNING JOURNAL</span>
+                <strong>KNOWLEDGE STREAM</strong>
+              </div>
+              <button
+                type="button"
+                className="article-reader-close"
+                onClick={() => setArticle(null)}
+                aria-label="Close article"
+              >
+                ESC / CLOSE ×
+              </button>
+            </div>
+
+            <div className="article-reader-body">
+              {articleLoading ? (
+                <div className="article-reader-state">
+                  <span className="article-reader-pulse" />
+                  <span>DECODING LEARNING JOURNAL…</span>
+                </div>
+              ) : articleError ? (
+                <div className="article-reader-state article-reader-error">
+                  <span>READ ERROR</span>
+                  <strong>{articleError}</strong>
+                  <button type="button" onClick={() => setArticle(null)}>RETURN TO JOURNAL</button>
+                </div>
+              ) : article ? (
+                <article className="article-content">
+                  <div className="article-kicker">GURUVERSE / FIELD NOTE</div>
+                  <h1>{article.title}</h1>
+                  <div className="article-rule" />
+                  <div dangerouslySetInnerHTML={{ __html: article.html }} />
+                  <footer>GURU CHARAN · GURUVERSE BLOGS</footer>
+                </article>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
