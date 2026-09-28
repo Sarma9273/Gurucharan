@@ -3,6 +3,26 @@ import gsap from 'gsap';
 import { asset } from '../config';
 import { focusModes, type FocusMode } from '../data';
 import SecurityScene from './SecurityScene';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
+
+class SecuritySceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error('GURUVERSE hero scene error:', error, info);
+  }
+
+  render() {
+    if (this.state.failed) {
+      return <div className="security-scene-fallback" aria-hidden="true" />;
+    }
+    return this.props.children;
+  }
+}
 
 type Props = {
   mode: FocusMode;
@@ -66,7 +86,7 @@ export default function Hero({ mode, onModeChange }: Props) {
       </div>
 
       <div className="hero-visual">
-        <SecurityScene mode={mode} />
+        <SecuritySceneBoundary><SecurityScene mode={mode} /></SecuritySceneBoundary>
         <div className="portrait-frame">
           <img
             className="hero-portrait"
