@@ -12,10 +12,10 @@ import LiveJournal from './components/LiveJournal';
 import Contact from './components/Contact';
 
 export default function App() {
-  const [ready, setReady] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
   const [mode, setMode] = useState<FocusMode>('ai');
 
-  const complete = useCallback(() => setReady(true), []);
+  const complete = useCallback(() => setShowIntro(false), []);
 
   useEffect(() => {
     document.documentElement.dataset.mode = mode;
@@ -23,10 +23,10 @@ export default function App() {
 
   return (
     <>
-      {!ready && <CinematicLoader onComplete={complete} />}
+      {showIntro && <CinematicLoader onComplete={complete} />}
       <CustomCursor />
       <Header />
-      <main className={ready ? 'site-ready' : ''}>
+      <main>
         <Hero mode={mode} onModeChange={setMode} />
         <Journey />
         <Projects />
