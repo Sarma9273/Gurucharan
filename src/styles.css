@@ -95,6 +95,8 @@ main.site-ready { opacity: 1; }
   font: 700 10px var(--mono); letter-spacing: .15em; text-transform: uppercase; cursor: pointer;
 }
 
+.loader-article { z-index: 2000; }
+
 /* Cursor */
 .cursor-dot, .cursor-ring {
   position: fixed; z-index: 1200; pointer-events: none; left: 0; top: 0; transform: translate(-50%,-50%);
