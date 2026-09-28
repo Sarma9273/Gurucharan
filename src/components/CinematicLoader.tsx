@@ -1,14 +1,25 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 
-type Props = { onComplete: () => void };
+type Props = {
+  onComplete: () => void;
+  variant?: 'boot' | 'article';
+};
 
-const messages = [
+const BOOT_MESSAGES = [
   'Identity signal detected',
   'Mapping security systems',
   'Connecting project archives',
   'Synchronising learning journal',
   'Access granted',
+];
+
+const ARTICLE_MESSAGES = [
+  'Opening knowledge stream',
+  'Decoding journal payload',
+  'Reconstructing field notes',
+  'Synchronising article content',
+  'Knowledge stream ready',
 ];
 
 function hasSeenIntro() {
@@ -27,17 +38,20 @@ function markIntroSeen() {
   }
 }
 
-export default function CinematicLoader({ onComplete }: Props) {
+export default function CinematicLoader({ onComplete, variant = 'boot' }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const completed = useRef(false);
   const [progress, setProgress] = useState(0);
   const [messageIndex, setMessageIndex] = useState(0);
 
+  const isArticle = variant === 'article';
+  const messages = isArticle ? ARTICLE_MESSAGES : BOOT_MESSAGES;
+
   useEffect(() => {
     const finish = () => {
       if (completed.current) return;
       completed.current = true;
-      markIntroSeen();
+      if (!isArticle) markIntroSeen();
 
       const element = root.current;
       if (!element) {
@@ -57,7 +71,7 @@ export default function CinematicLoader({ onComplete }: Props) {
       });
     };
 
-    if (hasSeenIntro()) {
+    if (!isArticle && hasSeenIntro()) {
       finish();
       return;
     }
@@ -65,7 +79,7 @@ export default function CinematicLoader({ onComplete }: Props) {
     const value = { current: 0 };
     const tween = gsap.to(value, {
       current: 100,
-      duration: 2.4,
+      duration: isArticle ? 1.9 : 2.4,
       ease: 'power2.inOut',
       onUpdate: () => {
         const next = Math.round(value.current);
@@ -75,19 +89,20 @@ export default function CinematicLoader({ onComplete }: Props) {
       onComplete: finish,
     });
 
-    // JS safety net: never let the intro block the site.
-    const safetyTimer = window.setTimeout(finish, 5000);
+    // Safety net: this overlay can never permanently block the portfolio.
+    const safetyTimer = window.setTimeout(finish, isArticle ? 3000 : 5000);
 
     return () => {
       tween.kill();
       window.clearTimeout(safetyTimer);
     };
-  }, [onComplete]);
+  }, [isArticle, messages.length, onComplete]);
 
   const skip = () => {
     if (completed.current) return;
     completed.current = true;
-    markIntroSeen();
+    if (!isArticle) markIntroSeen();
+
     gsap.to(root.current, {
       opacity: 0,
       duration: 0.45,
@@ -99,7 +114,7 @@ export default function CinematicLoader({ onComplete }: Props) {
   };
 
   return (
-    <div className="loader" ref={root}>
+    <div className={`loader ${isArticle ? 'loader-article' : ''}`} ref={root}>
       <div className="loader-grid" />
       <div className="loader-orbit">
         <span />
@@ -107,15 +122,21 @@ export default function CinematicLoader({ onComplete }: Props) {
         <span />
       </div>
       <div className="loader-copy">
-        <span className="micro-label">GURU CHARAN / SECURITY INTELLIGENCE UNIVERSE</span>
-        <h1>INITIALISING<br />IDENTITY SYSTEM</h1>
+        <span className="micro-label">
+          {isArticle ? 'GURUVERSE / LIVE LEARNING JOURNAL' : 'GURU CHARAN / SECURITY INTELLIGENCE UNIVERSE'}
+        </span>
+        <h1>
+          {isArticle ? <>OPENING<br />KNOWLEDGE STREAM</> : <>INITIALISING<br />IDENTITY SYSTEM</>}
+        </h1>
         <div className="loader-status">
           <span>{messages[messageIndex]}</span>
           <strong>{String(progress).padStart(3, '0')}%</strong>
         </div>
         <div className="loader-track"><i style={{ width: `${progress}%` }} /></div>
       </div>
-      <button type="button" className="loader-skip" onClick={skip}>Skip intro</button>
+      <button type="button" className="loader-skip" onClick={skip}>
+        Skip intro
+      </button>
     </div>
   );
 }
