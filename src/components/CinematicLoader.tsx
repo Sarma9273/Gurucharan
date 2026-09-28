@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 
 type Props = { onComplete: () => void };
@@ -11,6 +11,22 @@ const messages = [
   'Access granted',
 ];
 
+function hasSeenIntro() {
+  try {
+    return sessionStorage.getItem('gc-intro-seen') === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function markIntroSeen() {
+  try {
+    sessionStorage.setItem('gc-intro-seen', 'true');
+  } catch {
+    // Storage can be unavailable in privacy-restricted browser contexts.
+  }
+}
+
 export default function CinematicLoader({ onComplete }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const completed = useRef(false);
@@ -21,7 +37,7 @@ export default function CinematicLoader({ onComplete }: Props) {
     const finish = () => {
       if (completed.current) return;
       completed.current = true;
-      sessionStorage.setItem('gc-intro-seen', 'true');
+      markIntroSeen();
 
       const element = root.current;
       if (!element) {
@@ -30,6 +46,7 @@ export default function CinematicLoader({ onComplete }: Props) {
       }
 
       gsap.to(element, {
+        opacity: 0,
         clipPath: 'inset(0 0 100% 0)',
         duration: 0.65,
         ease: 'power4.inOut',
@@ -40,8 +57,8 @@ export default function CinematicLoader({ onComplete }: Props) {
       });
     };
 
-    if (sessionStorage.getItem('gc-intro-seen')) {
-      onComplete();
+    if (hasSeenIntro()) {
+      finish();
       return;
     }
 
@@ -58,7 +75,7 @@ export default function CinematicLoader({ onComplete }: Props) {
       onComplete: finish,
     });
 
-    // Never allow the intro to become a permanent black screen.
+    // JS safety net: never let the intro block the site.
     const safetyTimer = window.setTimeout(finish, 5000);
 
     return () => {
@@ -68,8 +85,9 @@ export default function CinematicLoader({ onComplete }: Props) {
   }, [onComplete]);
 
   const skip = () => {
-    sessionStorage.setItem('gc-intro-seen', 'true');
+    if (completed.current) return;
     completed.current = true;
+    markIntroSeen();
     gsap.to(root.current, {
       opacity: 0,
       duration: 0.45,
@@ -101,4 +119,3 @@ export default function CinematicLoader({ onComplete }: Props) {
     </div>
   );
 }
-
