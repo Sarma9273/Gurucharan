@@ -67,7 +67,7 @@ export default function TechUniverse() {
   ];
 
   return (
-    <section className="tech section">
+    <section id="technology" className="tech section">
       <div className="section-heading compact">
         <span className="micro-label">04 / TECHNOLOGY UNIVERSE</span>
         <h2>Tools connected<br />to real evidence.</h2>
