@@ -203,7 +203,7 @@ function getBlogs_(refresh) {
     const description = descriptionFromText_(text);
     const domain = inferDomain_(title + ' ' + text);
     const tags = inferTags_(title + ' ' + text);
-    const readingTime = Math.max(1, Math.ceil((text ? text.split(/\\s+/).length : 0) / 220));
+    const readingTime = Math.max(1, Math.ceil((text ? text.split(/\s+/).length : 0) / 220));
 
     blogs.push({
       id: tab.getId(),
