@@ -62,7 +62,6 @@ main.site-ready { opacity: 1; }
   place-items: center;
   overflow: hidden;
   clip-path: inset(0 0 0 0);
-  animation: loader-failsafe 6s linear forwards;
 }
 .loader-grid, .hero-grid {
   position: absolute; inset: 0; opacity: .18;
@@ -627,9 +626,4 @@ main.site-ready { opacity: 1; }
   .article-content h1 { font-size: 52px; }
   .article-content p,
   .article-content li { font-size: 15px; }
-}
-
-@keyframes loader-failsafe {
-  0%, 84% { opacity: 1; visibility: visible; }
-  100% { opacity: 0; visibility: hidden; pointer-events: none; }
 }
