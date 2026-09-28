@@ -385,3 +385,5 @@ main.site-ready { opacity: 1; }
   html { scroll-behavior: auto; }
   *,*::before,*::after { animation-duration: .01ms!important; animation-iteration-count: 1!important; transition-duration: .01ms!important; }
 }
+
+.tech-fallback{position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%);width:min(620px,calc(100% - 48px));padding:28px;border:1px solid var(--line);background:rgba(5,7,11,.92);color:var(--muted)}.tech-fallback span{color:var(--amber);font:700 9px var(--mono);letter-spacing:.14em}.tech-fallback strong{display:block;margin:14px 0 8px;color:var(--text);font:500 28px/1.05 var(--display)}.tech-fallback p{margin:0;line-height:1.6}
