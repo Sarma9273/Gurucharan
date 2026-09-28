@@ -2,8 +2,12 @@ import { useEffect, useState } from 'react';
 
 const links = [
   ['Journey', '#journey'],
+  ['About', '#about'],
+  ['Experience', '#experience'],
   ['Projects', '#projects'],
   ['Architecture', '#architecture'],
+  ['Research', '#research'],
+  ['Technology', '#technology'],
   ['Journal', '#journal'],
   ['Contact', '#contact'],
 ];
@@ -30,7 +34,7 @@ export default function Header() {
           <a key={href} href={href} onClick={() => setOpen(false)}>{label}</a>
         ))}
       </nav>
-      <a className="header-signal" href="#contact"><i /> Available for product-focused roles</a>
+      <a className="header-signal" href="/Gurucharan/resume/Guru_Charan_Mavuduru_Resume.pdf" target="_blank" rel="noreferrer"><i /> Open Resume ↗</a>
       <button
         className="menu-toggle"
         type="button"
