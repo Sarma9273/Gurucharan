@@ -133,7 +133,7 @@ main.site-ready { opacity: 1; }
 .hero-copy { position: relative; z-index: 5; align-self: center; max-width: 920px; }
 .hero h1 { margin: 24px 0 28px; font: 600 clamp(84px, 12.2vw, 202px)/.69 var(--display); letter-spacing: -.09em; }
 .hero h1 span { display: block; }
-.hero h1 .outline { color: transparent; -webkit-text-stroke: 1px rgba(244,241,232,.68); margin-left: clamp(20px, 7vw, 120px); }
+.hero h1 .outline { color: transparent; -webkit-text-stroke: 2.5px rgba(244,241,232,.9); text-shadow: 0 0 18px rgba(244,241,232,.08); margin-left: clamp(20px, 7vw, 120px); }
 .hero-statement { width: min(560px, 100%); margin-left: clamp(20px, 7vw, 120px); padding-left: 20px; border-left: 1px solid var(--mode); }
 .hero-statement > span { font: 700 10px var(--mono); color: var(--mode); letter-spacing: .15em; }
 .hero-statement h2 { margin: 12px 0; font: 500 clamp(25px, 3vw, 43px)/1.02 var(--display); letter-spacing: -.04em; }
