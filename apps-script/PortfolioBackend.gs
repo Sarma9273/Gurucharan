@@ -76,7 +76,11 @@ function doGet(e) {
   }
 
   if (action === 'read') {
-    return renderArticle_(String(e.parameter.id || ''));
+    const tabId = String(e.parameter.id || '');
+    if (String(e.parameter.format || '') === 'json') {
+      return jsonOrJsonp_(getArticleData_(tabId), e);
+    }
+    return renderArticle_(tabId);
   }
 
   if (action === 'diagnostics') {
@@ -127,7 +131,7 @@ function doPost(e) {
       message,
       '',
       'Received: ' + new Date().toString(),
-    ].join('\\n');
+    ].join('\n');
 
     MailApp.sendEmail({
       to: GC.CONTACT_TO,
@@ -229,19 +233,31 @@ function findTabById_(doc, tabId) {
   return null;
 }
 
-function renderArticle_(tabId) {
-  if (!tabId) return HtmlService.createHtmlOutput('Article ID missing.');
+function getArticleData_(tabId) {
+  if (!tabId) return { ok: false, error: 'Article ID missing.' };
 
   const doc = getMasterBlogDocument_();
   const tab = findTabById_(doc, tabId);
 
-  if (!tab) return HtmlService.createHtmlOutput('Article not found.');
+  if (!tab) return { ok: false, error: 'Article not found.' };
 
   const documentTab = tab.asDocumentTab();
   const body = documentTab.getBody();
   const title = tab.getTitle().trim() || 'GURUVERSE Blog';
 
-  const articleHtml = renderBody_(body);
+  return {
+    ok: true,
+    title: title,
+    html: renderBody_(body),
+  };
+}
+
+function renderArticle_(tabId) {
+  const data = getArticleData_(tabId);
+  if (!data.ok) return HtmlService.createHtmlOutput(escapeHtml_(data.error || 'Article not found.'));
+
+  const title = data.title;
+  const articleHtml = data.html;
 
   const html =
     '<!doctype html><html><head>' +
@@ -290,7 +306,7 @@ function renderBody_(body) {
     chunks.push(renderElement_(element));
   }
 
-  return chunks.filter(Boolean).join('\\n');
+  return chunks.filter(Boolean).join('\n');
 }
 
 function renderElement_(element) {
@@ -430,7 +446,7 @@ function enforceContactCooldown_(email) {
 }
 
 function descriptionFromText_(text) {
-  const clean = String(text || '').replace(/\\s+/g, ' ').trim();
+  const clean = String(text || '').replace(/\s+/g, ' ').trim();
   return clean.length > 280
     ? clean.substring(0, 277).replace(/\\s+\\S*$/, '') + '…'
     : clean;
@@ -471,9 +487,9 @@ function inferTags_(text) {
 
   const mapping = [
     ['Python', /python/],
-    ['SOC', /\\bsoc\\b|security operations/],
+    ['SOC', /\bsoc\b|security operations/],
     ['Cybersecurity', /cybersecurity|security/],
-    ['Artificial Intelligence', /artificial intelligence|\\bai\\b/],
+    ['Artificial Intelligence', /artificial intelligence|\bai\b/],
     ['FAISS', /faiss/],
     ['MITRE ATT&CK', /mitre/],
     ['Splunk', /splunk/],
@@ -504,24 +520,25 @@ function inferStatus_(text) {
 
 function clean_(value, limit) {
   return String(value || '')
-    .replace(/[\\u0000-\\u001F]/g, ' ')
-    .replace(/\\s+/g, ' ')
+    .replace(/[\u0000-\u001F]/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim()
     .substring(0, limit);
 }
 
 function isEmail_(value) {
-  return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
 function contactResponse_(payload) {
-  const safePayload = JSON.stringify(payload).replace(/</g, '\\u003c');
+  const message = Object.assign({ type: 'portfolio-contact' }, payload);
+  const safePayload = JSON.stringify(message).replace(/</g, '\\u003c');
 
   return HtmlService.createHtmlOutput(
     '<!doctype html><html><body><script>' +
-    'window.parent.postMessage({type:"portfolio-contact",...' +
+    'window.parent.postMessage(' +
     safePayload +
-    '}, "*");' +
+    ', "*");' +
     '</script></body></html>'
   ).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
