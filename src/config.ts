@@ -9,4 +9,4 @@ export const PORTFOLIO_API_URL =
 export const hasLiveBackend = Boolean(PORTFOLIO_API_URL);
 
 export const asset = (path: string) =>
-  `${import.meta.env.BASE_URL}${path.replace(/^\\/+/, '')}`;
+  `${import.meta.env.BASE_URL}${path.split('/').filter(Boolean).join('/')}`;
