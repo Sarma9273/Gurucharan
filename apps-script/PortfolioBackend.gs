@@ -23,6 +23,7 @@ const GC = Object.freeze({
   CACHE_SECONDS: 120,
   MAX_BLOGS: 100,
   CONTACT_COOLDOWN_SECONDS: 45,
+  GLOBAL_CONTACT_COOLDOWN_SECONDS: 5,
 });
 
 function setupPortfolioSystem() {
@@ -184,6 +185,7 @@ function doPost(e) {
     }
 
     enforceContactCooldown_(email);
+    enforceGlobalContactCooldown_();
 
     const body = [
       'New portfolio message',
@@ -207,9 +209,9 @@ function doPost(e) {
       name: GC.SITE_NAME,
     });
 
-    return json_({ ok: true, message: 'Message sent.' });
+    return contactResponse_({ ok: true, message: 'Message sent.' });
   } catch (error) {
-    return json_({ ok: false, error: error.message });
+    return contactResponse_({ ok: false, error: 'The message could not be delivered. Please use the email link instead.' });
   }
 }
 
@@ -302,6 +304,7 @@ function renderArticle_(id) {
   if (!id) return HtmlService.createHtmlOutput('Article ID missing.');
 
   const file = DriveApp.getFileById(id);
+  if (!isPublishedBlogFile_(file)) return HtmlService.createHtmlOutput('Article not found.');
   if (file.getMimeType() !== MimeType.GOOGLE_DOCS) {
     return HtmlService.createHtmlOutput('Unsupported article type.');
   }
@@ -339,7 +342,6 @@ function diagnostics_() {
     triggerCount: ScriptApp.getProjectTriggers().filter(function(trigger) {
       return trigger.getHandlerFunction() === 'syncFutureBlogs';
     }).length,
-    contactTo: GC.CONTACT_TO,
     webAppUrl: ScriptApp.getService().getUrl(),
   };
 }
@@ -466,11 +468,34 @@ function inferStatus_(text) {
   return 'Learning note';
 }
 
+function enforceGlobalContactCooldown_() {
+  const cache = CacheService.getScriptCache();
+  const key = 'contact-global';
+  if (cache.get(key)) throw new Error('Please wait a few seconds before sending another message.');
+  cache.put(key, '1', GC.GLOBAL_CONTACT_COOLDOWN_SECONDS);
+}
+
 function enforceContactCooldown_(email) {
   const cache = CacheService.getScriptCache();
   const key = 'contact-' + Utilities.base64EncodeWebSafe(email.toLowerCase()).substring(0, 40);
   if (cache.get(key)) throw new Error('Please wait before sending another message.');
   cache.put(key, '1', GC.CONTACT_COOLDOWN_SECONDS);
+}
+
+function isPublishedBlogFile_(file) {
+  const blogsFolder = getBlogsFolder_();
+  const parents = file.getParents();
+  while (parents.hasNext()) {
+    if (parents.next().getId() === blogsFolder.getId()) return true;
+  }
+  return false;
+}
+
+function contactResponse_(payload) {
+  const safePayload = JSON.stringify(payload).replace(/</g, '\\u003c');
+  return HtmlService.createHtmlOutput(
+    '<!doctype html><html><body><script>window.parent.postMessage({type:"portfolio-contact",...'+safePayload+'},"*");</script></body></html>'
+  ).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 function clean_(value, limit) {

@@ -1,10 +1,12 @@
-export const PORTFOLIO_API_URL =
-  'PASTE_NEW_GOOGLE_APPS_SCRIPT_EXEC_URL_HERE';
+const configuredBackendUrl = (import.meta.env.VITE_PORTFOLIO_API_URL || '').trim();
 
-export const hasLiveBackend =
-  PORTFOLIO_API_URL.startsWith('https://script.google.com/macros/s/') &&
-  PORTFOLIO_API_URL.endsWith('/exec') &&
-  !PORTFOLIO_API_URL.includes('PASTE_');
+export const PORTFOLIO_API_URL =
+  configuredBackendUrl.startsWith('https://script.google.com/macros/s/') &&
+  configuredBackendUrl.endsWith('/exec')
+    ? configuredBackendUrl
+    : '';
+
+export const hasLiveBackend = Boolean(PORTFOLIO_API_URL);
 
 export const asset = (path: string) =>
-  `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
+  `${import.meta.env.BASE_URL}${path.split('/').filter(Boolean).join('/')}`;
