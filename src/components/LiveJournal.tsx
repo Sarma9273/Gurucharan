@@ -30,12 +30,17 @@ const ALLOWED_TAGS = new Set([
 ]);
 
 const ALLOWED_ATTRS = new Set([
-  'ALT', 'COLSPAN', 'HEIGHT', 'HREF', 'REL', 'ROWSPAN', 'SRC', 'TARGET', 'TITLE', 'WIDTH', 'CLASS',
+  'ALT', 'COLSPAN', 'HEIGHT', 'HREF', 'REL', 'REFERRERPOLICY', 'ROWSPAN', 'SRC',
+  'TARGET', 'TITLE', 'WIDTH', 'CLASS',
 ]);
 
 function isSafeUrl(value: string, kind: 'href' | 'src') {
   const trimmed = value.trim();
   if (!trimmed) return false;
+
+  if (kind === 'src' && /^data:image\/(?:png|jpeg|gif|webp);base64,[a-z0-9+/=\s]+$/i.test(trimmed)) {
+    return true;
+  }
 
   try {
     const url = new URL(trimmed, window.location.href);
@@ -81,6 +86,7 @@ function sanitizeArticleHtml(dirtyHtml: string) {
       }
       element.setAttribute('loading', 'lazy');
       element.setAttribute('decoding', 'async');
+      element.setAttribute('referrerpolicy', 'no-referrer');
     }
   }
 
