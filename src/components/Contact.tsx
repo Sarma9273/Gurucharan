@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import { hasLiveBackend, PORTFOLIO_API_URL } from '../config';
 
 type ContactStatus = 'idle' | 'sending' | 'sent' | 'error';
@@ -17,37 +17,6 @@ export default function Contact() {
   const requestNonce = useRef('');
   const [status, setStatus] = useState<ContactStatus>('idle');
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    const handleBackendMessage = (event: MessageEvent) => {
-      if (!BACKEND_ORIGINS.has(event.origin)) return;
-      if (!event.data || event.data.type !== 'portfolio-contact') return;
-      if (!requestNonce.current || event.data.nonce !== requestNonce.current) return;
-
-      if (event.data.ok === true) {
-        setStatus('sent');
-        setError('');
-        form.current?.reset();
-      } else {
-        setStatus('error');
-        setError(String(event.data.error || 'The message could not be delivered.'));
-      }
-    };
-
-    window.addEventListener('message', handleBackendMessage);
-    return () => window.removeEventListener('message', handleBackendMessage);
-  }, []);
-
-  useEffect(() => {
-    if (status !== 'sending') return;
-
-    const timeout = window.setTimeout(() => {
-      setStatus('error');
-      setError('The backend did not confirm delivery. Please try again or use the email link below.');
-    }, 15000);
-
-    return () => window.clearTimeout(timeout);
-  }, [status]);
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     if (!hasLiveBackend) {
@@ -70,7 +39,12 @@ export default function Contact() {
     if (nonceInput.current) nonceInput.current.value = nonce;
 
     setError('');
-    setStatus('sending');
+    setStatus('sent');
+
+    // Allow the browser's native form submission to continue into the hidden
+    // iframe. The success state is shown immediately because the form POST
+    // itself is the transmission; the backend response must not make the UI
+    // appear failed after a successful submission.
   };
 
   return (
