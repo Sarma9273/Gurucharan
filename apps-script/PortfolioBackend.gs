@@ -94,15 +94,23 @@ function doGet(e) {
 }
 
 function doPost(e) {
-  try {
-    const data = e && e.parameter ? e.parameter : {};
+  const data = e && e.parameter ? e.parameter : {};
+  const requestNonce = clean_(data.nonce, 128);
 
+  try {
     if (String(data.action || '') !== 'contact') {
-      return contactResponse_({ ok: false, error: 'Unknown action' });
+      return contactResponse_({ ok: false, error: 'Unknown action' }, requestNonce);
     }
 
     if (String(data.company_website || '').trim()) {
-      return contactResponse_({ ok: true });
+      return contactResponse_({ ok: true }, requestNonce);
+    }
+
+    if (!/^[a-f0-9]{32}$/i.test(requestNonce)) {
+      return contactResponse_({
+        ok: false,
+        error: 'Invalid contact request.',
+      }, requestNonce);
     }
 
     const name = clean_(data.name, 100);
@@ -115,7 +123,7 @@ function doPost(e) {
       return contactResponse_({
         ok: false,
         error: 'Please provide valid contact details.',
-      });
+      }, requestNonce);
     }
 
     enforceContactCooldown_(email);
@@ -143,13 +151,13 @@ function doPost(e) {
       name: GC.SITE_NAME,
     });
 
-    return contactResponse_({ ok: true, message: 'Message sent.' });
+    return contactResponse_({ ok: true, message: 'Message sent.' }, requestNonce);
   } catch (error) {
     console.error(error);
     return contactResponse_({
       ok: false,
       error: 'The message could not be delivered. Please use the email link instead.',
-    });
+    }, requestNonce);
   }
 }
 
@@ -527,17 +535,21 @@ function isEmail_(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-function contactResponse_(payload) {
-  const message = Object.assign({ type: 'portfolio-contact' }, payload);
+function contactResponse_(payload, requestNonce) {
+  const message = Object.assign(
+    { type: 'portfolio-contact', nonce: String(requestNonce || '') },
+    payload
+  );
   const safePayload = JSON.stringify(message).replace(/</g, '\\u003c');
 
-  // The response is embedded by the production GitHub Pages site.
-  // Keep the postMessage target exact instead of broadcasting it to every origin.
+  // Apps Script HTML web apps use an additional sandboxed iframe.
+  // Post to the actual top-level GitHub Pages window rather than the
+  // intermediate Google wrapper frame.
   const targetOrigin = 'https://sarma9273.github.io';
 
   return HtmlService.createHtmlOutput(
     '<!doctype html><html><body><script>' +
-    'window.parent.postMessage(' +
+    'window.top.postMessage(' +
     safePayload +
     ', ' + JSON.stringify(targetOrigin) + ');' +
     '</script></body></html>'
