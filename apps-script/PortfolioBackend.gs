@@ -531,11 +531,15 @@ function contactResponse_(payload) {
   const message = Object.assign({ type: 'portfolio-contact' }, payload);
   const safePayload = JSON.stringify(message).replace(/</g, '\\u003c');
 
+  // The response is embedded by the production GitHub Pages site.
+  // Keep the postMessage target exact instead of broadcasting it to every origin.
+  const targetOrigin = 'https://sarma9273.github.io';
+
   return HtmlService.createHtmlOutput(
     '<!doctype html><html><body><script>' +
     'window.parent.postMessage(' +
     safePayload +
-    ', "*");' +
+    ', ' + JSON.stringify(targetOrigin) + ');' +
     '</script></body></html>'
   ).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
