@@ -325,6 +325,8 @@ main.site-ready { opacity: 1; }
 .contact-form input:focus, .contact-form textarea:focus { border-color: var(--mode); }
 .contact-form button { border: 1px solid var(--mode); background: color-mix(in srgb,var(--mode) 10%,transparent); color: var(--mode); padding: 17px; font: 700 10px var(--mono); letter-spacing: .12em; cursor: pointer; transition: .3s; }
 .contact-form button:hover { background: var(--mode); color: #030507; box-shadow: 0 0 35px color-mix(in srgb,var(--mode) 25%,transparent); }
+.contact-form .new-message-button { margin-top: 4px; border-color: var(--line); background: transparent; color: var(--muted); }
+.contact-form .new-message-button:hover { border-color: var(--mode); background: color-mix(in srgb,var(--mode) 8%,transparent); color: var(--mode); box-shadow: none; }
 .honeypot { position: absolute!important; left: -9999px!important; }
 .backend-note { color: var(--amber); font: 8px var(--mono); }
 .footer { min-height: 110px; display: flex; justify-content: space-between; align-items: center; padding: 0 clamp(24px,6vw,100px); border-top: 1px solid var(--line); font: 700 8px var(--mono); letter-spacing: .1em; color: var(--muted); }
