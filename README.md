@@ -20,7 +20,7 @@ The site is inspired by the ambition of immersive creative portfolios, but its c
 ## Quick start
 
 ```powershell
-npm install
+npm ci
 npm run dev
 ```
 
@@ -30,32 +30,28 @@ Open:
 http://localhost:5173/Gurucharan/
 ```
 
-## Connect the fresh backend
-
-1. Create a blank Google Apps Script project.
-2. Paste `apps-script/PortfolioBackend.gs` into `Code.gs`.
-3. Run `setupPortfolioSystem()`.
-4. Run `installPortfolioAutomation()`.
-5. Deploy as a Web App:
-   - Execute as: Me
-   - Access: Anyone
-6. Copy the URL ending in `/exec`.
-7. Open `src/config.ts`.
-8. Replace `PASTE_NEW_GOOGLE_APPS_SCRIPT_EXEC_URL_HERE`.
-9. Restart the Vite dev server.
-
 ## GitHub Pages
 
-Create a public repository named `Gurucharan`, push this source to `main`, and select:
+The repository deploys from `main` through GitHub Actions. Keep the repository variable `VITE_PORTFOLIO_API_URL` configured with the public Apps Script `/exec` URL when the live journal and contact backend are enabled.
 
-```text
-Settings → Pages → Source: GitHub Actions
-```
+If that variable is absent or malformed, the frontend disables the live backend and falls back safely.
 
-The expected site URL is:
+Expected site:
 
 ```text
 https://sarma9273.github.io/Gurucharan/
 ```
 
-This hostname belongs to the GitHub account; it does not depend on an old `Sarma9273.github.io` repository.
+## Security baseline
+
+- Content Security Policy is defined in `index.html`.
+- Article HTML is allowlisted and sanitized before React renders it.
+- Google Drive article IDs are restricted to tabs in the configured master document.
+- Contact input is length-limited, validated, honeypot-protected and rate-limited.
+- CI runs TypeScript checks, production builds and high-severity dependency audits.
+- CodeQL and dependency-review workflows provide additional GitHub-side analysis.
+- GitHub Actions use least-privilege job permissions and full commit-SHA pinning.
+
+Do not commit credentials, tokens, private keys or local environment files. Use GitHub Actions variables/secrets and Apps Script project configuration for runtime configuration.
+
+For vulnerability reports, use the repository's `SECURITY.md` process.
