@@ -13,14 +13,16 @@ const BACKEND_ORIGINS = new Set([
 export default function Contact() {
   const form = useRef<HTMLFormElement>(null);
   const responseFrame = useRef<HTMLIFrameElement>(null);
+  const nonceInput = useRef<HTMLInputElement>(null);
+  const requestNonce = useRef('');
   const [status, setStatus] = useState<ContactStatus>('idle');
   const [error, setError] = useState('');
 
   useEffect(() => {
     const handleBackendMessage = (event: MessageEvent) => {
-      if (event.source !== responseFrame.current?.contentWindow) return;
       if (!BACKEND_ORIGINS.has(event.origin)) return;
       if (!event.data || event.data.type !== 'portfolio-contact') return;
+      if (!requestNonce.current || event.data.nonce !== requestNonce.current) return;
 
       if (event.data.ok === true) {
         setStatus('sent');
@@ -56,6 +58,16 @@ export default function Contact() {
         `mailto:${MAIL_TO}?subject=${encodeURIComponent('Portfolio conversation')}`;
       return;
     }
+
+    const nonce =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID().replace(/-/g, '')
+        : Array.from(crypto.getRandomValues(new Uint8Array(16)))
+            .map((value) => value.toString(16).padStart(2, '0'))
+            .join('');
+
+    requestNonce.current = nonce;
+    if (nonceInput.current) nonceInput.current.value = nonce;
 
     setError('');
     setStatus('sending');
@@ -93,6 +105,7 @@ export default function Contact() {
             onSubmit={submit}
           >
             <input type="hidden" name="action" value="contact" />
+            <input ref={nonceInput} type="hidden" name="nonce" value="" />
             <input type="hidden" name="source" value="Gurucharan cinematic portfolio" />
 
             <label>
