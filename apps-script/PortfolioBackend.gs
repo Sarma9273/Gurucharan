@@ -23,8 +23,8 @@ const GC = Object.freeze({
   CACHE_SECONDS: 120,
   MAX_BLOGS: 100,
 
-  CONTACT_COOLDOWN_SECONDS: 45,
-  GLOBAL_CONTACT_COOLDOWN_SECONDS: 5,
+  CONTACT_COOLDOWN_SECONDS: 60,
+  GLOBAL_CONTACT_COOLDOWN_SECONDS: 15,
 });
 
 function setupGuruverseBackend() {
@@ -84,7 +84,10 @@ function doGet(e) {
   }
 
   if (action === 'diagnostics') {
-    return jsonOrJsonp_(diagnostics_(), e);
+    return jsonOrJsonp_({
+      ok: false,
+      error: 'Diagnostics are not public.',
+    }, e);
   }
 
   return jsonOrJsonp_({ ok: false, error: 'Unknown action' }, e);
@@ -98,7 +101,6 @@ function doPost(e) {
       return contactResponse_({ ok: false, error: 'Unknown action' });
     }
 
-    // Honeypot.
     if (String(data.company_website || '').trim()) {
       return contactResponse_({ ok: true });
     }
@@ -151,9 +153,6 @@ function doPost(e) {
   }
 }
 
-/**
- * Returns every top-level and nested Google Docs tab in display order.
- */
 function getAllTabs_(doc) {
   const allTabs = [];
   doc.getTabs().forEach(function(tab) {
@@ -196,7 +195,6 @@ function getBlogs_(refresh) {
     const body = documentTab.getBody();
     const text = body.getText().trim();
 
-    // Empty tabs are not published as blogs.
     if (!text && body.getNumChildren() === 0) return;
 
     const title = tab.getTitle().trim() || 'Untitled';
@@ -234,7 +232,9 @@ function findTabById_(doc, tabId) {
 }
 
 function getArticleData_(tabId) {
-  if (!tabId) return { ok: false, error: 'Article ID missing.' };
+  if (!/^[a-zA-Z0-9_-]{1,128}$/.test(tabId)) {
+    return { ok: false, error: 'Article not found.' };
+  }
 
   const doc = getMasterBlogDocument_();
   const tab = findTabById_(doc, tabId);
@@ -264,6 +264,7 @@ function renderArticle_(tabId) {
     '<meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<meta name="theme-color" content="#05070b">' +
+    '<meta name="referrer" content="no-referrer">' +
     '<title>' + escapeHtml_(title) + ' — GURUVERSE</title>' +
     '<style>' +
     'body{margin:0;background:#05070b;color:#f4f1e8;font:17px/1.8 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}' +
@@ -369,6 +370,9 @@ function renderInlineImage_(image) {
   try {
     const blob = image.getBlob();
     const mimeType = blob.getContentType() || 'image/png';
+
+    if (!/^image\/(?:png|jpeg|gif|webp)$/i.test(mimeType)) return '';
+
     const base64 = Utilities.base64Encode(blob.getBytes());
     return '<img class="article-image" src="data:' + mimeType + ';base64,' + base64 + '" alt="GURUVERSE article image">';
   } catch (error) {
@@ -405,32 +409,25 @@ function headingTag_(heading) {
   return '';
 }
 
-function diagnostics_() {
-  const properties = PropertiesService.getScriptProperties();
-  const doc = getMasterBlogDocument_();
-  const tabs = getAllTabs_(doc);
-
-  return {
-    ok: true,
-    service: GC.SITE_NAME,
-    blogDocumentName: doc.getName(),
-    blogDocumentConfigured: Boolean(properties.getProperty('GC_MASTER_BLOG_DOCUMENT_ID')),
-    blogTabCount: tabs.length,
-    contactConfigured: Boolean(GC.CONTACT_TO),
-    triggerCount: 0,
-    webAppUrl: ScriptApp.getService().getUrl(),
-  };
-}
-
 function enforceGlobalContactCooldown_() {
-  const cache = CacheService.getScriptCache();
-  const key = 'contact-global';
+  const lock = LockService.getScriptLock();
 
-  if (cache.get(key)) {
-    throw new Error('Please wait a few seconds before sending another message.');
+  if (!lock.tryLock(5000)) {
+    throw new Error('Please try again in a few seconds.');
   }
 
-  cache.put(key, '1', GC.GLOBAL_CONTACT_COOLDOWN_SECONDS);
+  try {
+    const cache = CacheService.getScriptCache();
+    const key = 'contact-global';
+
+    if (cache.get(key)) {
+      throw new Error('Please wait before sending another message.');
+    }
+
+    cache.put(key, '1', GC.GLOBAL_CONTACT_COOLDOWN_SECONDS);
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function enforceContactCooldown_(email) {
@@ -448,7 +445,7 @@ function enforceContactCooldown_(email) {
 function descriptionFromText_(text) {
   const clean = String(text || '').replace(/\s+/g, ' ').trim();
   return clean.length > 280
-    ? clean.substring(0, 277).replace(/\\s+\\S*$/, '') + '…'
+    ? clean.substring(0, 277).replace(/\s+\S*$/, '') + '…'
     : clean;
 }
 
@@ -559,16 +556,4 @@ function jsonOrJsonp_(payload, e) {
   }
 
   return json_(payload);
-}
-
-function escapeHtml_(value) {
-  return String(value || '').replace(/[&<>"']/g, function(character) {
-    return {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;',
-    }[character];
-  });
 }
