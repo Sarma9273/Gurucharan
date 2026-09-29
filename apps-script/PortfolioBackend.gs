@@ -232,7 +232,7 @@ function findTabById_(doc, tabId) {
 }
 
 function getArticleData_(tabId) {
-  if (!/^[a-zA-Z0-9_-]{1,128}$/.test(tabId)) {
+  if (!/^[a-zA-Z0-9._-]{1,128}$/.test(tabId)) {
     return { ok: false, error: 'Article not found.' };
   }
 
