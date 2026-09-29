@@ -42,9 +42,10 @@ export default function Hero({ mode, onModeChange }: Props) {
         stagger: 0.09,
         ease: 'power4.out',
       });
+      // Keep the portrait visible even if the animation is interrupted or the
+      // browser is still decoding the image while the cinematic intro runs.
       gsap.from('.hero-portrait', {
         xPercent: 20,
-        opacity: 0,
         duration: 1.6,
         ease: 'power3.out',
         delay: 0.2,
@@ -92,6 +93,9 @@ export default function Hero({ mode, onModeChange }: Props) {
             className="hero-portrait"
             src={asset('images/guru-front.webp')}
             alt="Guru Charan Mavuduru in professional attire"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
           />
           <div className="portrait-scan" />
           <span className="portrait-id">IDENTITY / GC-9273</span>
