@@ -79,8 +79,8 @@ export default function CinematicLoader({ onComplete, variant = 'boot' }: Props)
     const value = { current: 0 };
     const tween = gsap.to(value, {
       current: 100,
-      // The original GURUVERSE boot timing was 4.2s.
-      duration: isArticle ? 1.9 : 4.2,
+      // Keep the original cinematic sequence while shortening the first-visit wait.
+      duration: isArticle ? 1.9 : 2.8,
       ease: 'power2.inOut',
       onUpdate: () => {
         const next = Math.round(value.current);
@@ -91,7 +91,7 @@ export default function CinematicLoader({ onComplete, variant = 'boot' }: Props)
     });
 
     // Safety only; it never changes the normal 4.2s visual sequence.
-    const safetyTimer = window.setTimeout(finish, isArticle ? 3000 : 6000);
+    const safetyTimer = window.setTimeout(finish, isArticle ? 3000 : 4500);
 
     return () => {
       tween.kill();
