@@ -137,14 +137,16 @@ export default function Contact() {
               {status === 'sending'
                 ? 'TRANSMITTING…'
                 : status === 'sent'
-                  ? 'TRANSMISSION CONFIRMED ✓'
+                  ? 'THANKS FOR CONNECTING ✓'
                   : status === 'error'
                     ? 'RETRY TRANSMISSION'
                     : 'SEND SECURE MESSAGE'}
             </button>
 
-            {!hasLiveBackend && (
-              <small className="backend-note">Backend not connected yet; submission opens your email application.</small>
+            {status === 'sent' && (
+              <small className="backend-note">
+                Thanks for connecting — I’ll try to respond as fast as possible.
+              </small>
             )}
             {status === 'error' && <small className="backend-note">{error}</small>}
           </form>
