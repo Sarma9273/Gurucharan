@@ -14,9 +14,18 @@ export default function Contact() {
   const form = useRef<HTMLFormElement>(null);
   const responseFrame = useRef<HTMLIFrameElement>(null);
   const nonceInput = useRef<HTMLInputElement>(null);
+  const nameInput = useRef<HTMLInputElement>(null);
   const requestNonce = useRef('');
   const [status, setStatus] = useState<ContactStatus>('idle');
   const [error, setError] = useState('');
+
+  const startNewMessage = () => {
+    form.current?.reset();
+    requestNonce.current = '';
+    setError('');
+    setStatus('idle');
+    nameInput.current?.focus();
+  };
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     if (!hasLiveBackend) {
@@ -84,7 +93,7 @@ export default function Contact() {
 
             <label>
               <span>01 / Identity</span>
-              <input name="name" required maxLength={100} autoComplete="name" placeholder="Your name" />
+              <input ref={nameInput} name="name" required maxLength={100} autoComplete="name" placeholder="Your name" />
             </label>
 
             <label>
@@ -118,9 +127,18 @@ export default function Contact() {
             </button>
 
             {status === 'sent' && (
-              <small className="backend-note">
-                Thanks for connecting — I’ll try to respond as fast as possible.
-              </small>
+              <>
+                <small className="backend-note">
+                  Thanks for connecting — I’ll try to respond as fast as possible.
+                </small>
+                <button
+                  type="button"
+                  className="new-message-button"
+                  onClick={startNewMessage}
+                >
+                  WANT TO TELL MORE / NEW MESSAGE
+                </button>
+              </>
             )}
             {status === 'error' && <small className="backend-note">{error}</small>}
           </form>
