@@ -7,18 +7,14 @@ type Props = {
 };
 
 const BOOT_MESSAGES = [
-  'Identity signal detected',
-  'Mapping security systems',
-  'Connecting project archives',
-  'Synchronising learning journal',
-  'Access granted',
+  'Establishing secure channel',
+  'Loading portfolio systems',
+  'System online',
 ];
 
 const ARTICLE_MESSAGES = [
   'Opening knowledge stream',
-  'Decoding journal payload',
-  'Reconstructing field notes',
-  'Synchronising article content',
+  'Loading article content',
   'Knowledge stream ready',
 ];
 
@@ -62,7 +58,7 @@ export default function CinematicLoader({ onComplete, variant = 'boot' }: Props)
       // Preserve the original loader's reveal: the screen lifts upward.
       gsap.to(element, {
         clipPath: 'inset(0 0 100% 0)',
-        duration: isArticle ? 0.65 : 0.9,
+        duration: isArticle ? 0.45 : 0.55,
         ease: 'power4.inOut',
         onComplete: () => {
           element.style.display = 'none';
@@ -79,19 +75,19 @@ export default function CinematicLoader({ onComplete, variant = 'boot' }: Props)
     const value = { current: 0 };
     const tween = gsap.to(value, {
       current: 100,
-      // Keep the original cinematic sequence while shortening the first-visit wait.
-      duration: isArticle ? 1.9 : 2.8,
+      // Keep the intro cinematic without making visitors wait for an artificial load.
+      duration: isArticle ? 0.9 : 1.45,
       ease: 'power2.inOut',
       onUpdate: () => {
         const next = Math.round(value.current);
         setProgress(next);
-        setMessageIndex(Math.min(messages.length - 1, Math.floor(next / 22)));
+        setMessageIndex(Math.min(messages.length - 1, Math.floor(next / (100 / messages.length))));
       },
       onComplete: finish,
     });
 
-    // Safety only; it never changes the normal 4.2s visual sequence.
-    const safetyTimer = window.setTimeout(finish, isArticle ? 3000 : 4500);
+    // Safety only; normal completion happens well before this limit.
+    const safetyTimer = window.setTimeout(finish, isArticle ? 1800 : 2400);
 
     return () => {
       tween.kill();
